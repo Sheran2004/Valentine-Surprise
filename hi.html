@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forever Valentine ❤️</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+overflow:hidden;
+background:linear-gradient(135deg,#ffdde1,#ee9ca7);
+transition:background 1s ease;
+position:relative;
+}
+
+/* Floating hearts */
+.heart{
+position:fixed;
+bottom:-20px;
+font-size:20px;
+animation:floatUp linear infinite;
+opacity:0.6;
+}
+@keyframes floatUp{
+to{
+transform:translateY(-110vh);
+opacity:0;
+}
+}
+
+.container{
+background:rgba(255,255,255,0.95);
+padding:35px;
+border-radius:25px;
+box-shadow:0 20px 60px rgba(0,0,0,0.2);
+text-align:center;
+width:90%;
+max-width:480px;
+transition:.6s ease;
+position:relative;
+}
+
+h1{
+margin-bottom:15px;
+}
+
+button{
+padding:10px 25px;
+margin:8px;
+border:none;
+border-radius:25px;
+font-size:15px;
+cursor:pointer;
+transition:.3s ease;
+}
+
+button:hover{
+transform:scale(1.07);
+}
+
+.primary{
+background:#ff4e88;
+color:white;
+box-shadow:0 5px 20px rgba(255,78,136,0.4);
+}
+
+.secondary{
+background:#ddd;
+}
+
+.hidden{
+opacity:0;
+pointer-events:none;
+transform:scale(.9);
+}
+
+.message{
+margin-top:15px;
+text-align:left;
+font-size:13px;
+opacity:0;
+transition:.6s ease;
+}
+
+.message.show{
+opacity:1;
+}
+
+/* Slideshow */
+.slideshow{
+margin-top:15px;
+display:flex;
+justify-content:center;
+position:relative;
+}
+
+.slideshow img{
+width:260px;
+height:170px;
+object-fit:cover;
+border-radius:12px;
+display:none;
+box-shadow:0 10px 25px rgba(0,0,0,0.25);
+background:white;
+padding:8px;
+transition:opacity .8s ease;
+}
+
+.slideshow img.active{
+display:block;
+}
+
+/* Blurred background */
+.blur-bg{
+position:absolute;
+width:260px;
+height:170px;
+filter:blur(25px);
+z-index:-1;
+border-radius:20px;
+opacity:0.6;
+}
+
+/* Fireworks */
+.firework{
+position:fixed;
+width:6px;
+height:6px;
+border-radius:50%;
+animation:explode 1s ease-out forwards;
+}
+@keyframes explode{
+to{
+transform:translate(var(--x),var(--y));
+opacity:0;
+}
+}
+
+#loveLetter{
+margin-top:15px;
+font-size:13px;
+text-align:left;
+min-height:60px;
+}
+
+#lockedText{
+margin-top:15px;
+font-size:18px;
+opacity:0;
+transition:1s ease;
+}
+
+input{
+padding:10px;
+border-radius:20px;
+border:1px solid #ccc;
+width:80%;
+margin-bottom:10px;
+text-align:center;
+}
+
+</style>
+</head>
+<body>
+
+<audio id="bgMusic" loop>
+<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_8c7c0e38f7.mp3" type="audio/mpeg">
+</audio>
+
+<div class="container">
+
+<div id="nameScreen">
+<h1>Enter Your Love's Name ❤️</h1>
+<input type="text" id="nameInput" placeholder="Type name here">
+<br>
+<button class="primary" onclick="startExperience()">Continue</button>
+</div>
+
+<div id="valentineScreen" class="hidden">
+<h1 id="questionText"></h1>
+
+<div id="buttons">
+<button id="yesBtn" class="primary" onclick="acceptLove()">YES</button>
+<button id="noBtn" class="secondary" onclick="avoidLove()">NO 😅</button>
+</div>
+
+<div id="agreement" class="message">
+<p><strong>By clicking YES, you agree to:</strong></p><br>
+• Unlimited hugs 🤗<br>
+• Unlimited kisses 😘<br>
+• Unlimited love ❤️<br>
+• Late-night talks 🌙<br>
+• Stealing food 🍕<br>
+• Lifetime bad jokes 😄<br><br>
+Effective immediately 💍
+</div>
+
+<div id="loveLetter"></div>
+
+<div class="slideshow" id="slideshow">
+<div class="blur-bg" id="blurBg"></div>
+<img src="images/photo1.jpg" class="active">
+<img src="images/photo2.jpg">
+<img src="images/photo3.jpg">
+</div>
+
+<div id="lockedText">🔒 Locked Forever ❤️</div>
+
+<button id="shareBtn" class="primary hidden">Share This Moment 💌</button>
+
+</div>
+
+</div>
+
+<script>
+let noClicks=0;
+let slideIndex=0;
+let slides=document.querySelectorAll(".slideshow img");
+const letterText="From this moment, it's us. Every laugh, every memory, every late night talk — I want all of it with you.";
+
+function startExperience(){
+const name=document.getElementById("nameInput").value||"You";
+document.getElementById("nameScreen").classList.add("hidden");
+document.getElementById("valentineScreen").classList.remove("hidden");
+document.getElementById("questionText").innerText=name+", Will you be my Valentine? ❤️";
+document.getElementById("bgMusic").play();
+createHearts();
+startSlideshow();
+updateBlur();
+}
+
+function acceptLove(){
+document.getElementById("agreement").classList.add("show");
+setTimeout(()=>{
+document.getElementById("buttons").style.opacity="0";
+},1000);
+launchFireworks();
+typeLetter();
+setTimeout(()=>{
+document.getElementById("lockedText").style.opacity="1";
+document.getElementById("shareBtn").classList.remove("hidden");
+},4000);
+}
+
+function avoidLove(){
+const btn=document.getElementById("noBtn");
+noClicks++;
+btn.style.position="fixed";
+btn.style.left=Math.random()*(window.innerWidth-100)+"px";
+btn.style.top=Math.random()*(window.innerHeight-50)+"px";
+if(noClicks>=2){btn.innerHTML="NO 😳";}
+}
+
+function typeLetter(){
+let i=0;
+const target=document.getElementById("loveLetter");
+const typing=setInterval(()=>{
+target.innerHTML+=letterText.charAt(i);
+i++;
+if(i>=letterText.length){clearInterval(typing);}
+},40);
+}
+
+function launchFireworks(){
+for(let i=0;i<70;i++){
+const f=document.createElement("div");
+f.classList.add("firework");
+f.style.background=randomColor();
+f.style.left="50%";
+f.style.top="50%";
+f.style.setProperty('--x',(Math.random()*400-200)+"px");
+f.style.setProperty('--y',(Math.random()*400-200)+"px");
+document.body.appendChild(f);
+setTimeout(()=>f.remove(),1000);
+}
+}
+
+function randomColor(){
+const colors=["#ff4e88","#ffbe0b","#3a86ff","#8338ec","#fb5607"];
+return colors[Math.floor(Math.random()*colors.length)];
+}
+
+function startSlideshow(){
+setInterval(()=>{
+slides[slideIndex].classList.remove("active");
+slideIndex=(slideIndex+1)%slides.length;
+slides[slideIndex].classList.add("active");
+updateBlur();
+},2500);
+}
+
+/* Swipe support */
+let startX=0;
+document.getElementById("slideshow").addEventListener("touchstart",e=>{
+startX=e.touches[0].clientX;
+});
+document.getElementById("slideshow").addEventListener("touchend",e=>{
+let endX=e.changedTouches[0].clientX;
+if(endX<startX-50){nextSlide();}
+if(endX>startX+50){prevSlide();}
+});
+
+function nextSlide(){
+slides[slideIndex].classList.remove("active");
+slideIndex=(slideIndex+1)%slides.length;
+slides[slideIndex].classList.add("active");
+updateBlur();
+}
+
+function prevSlide(){
+slides[slideIndex].classList.remove("active");
+slideIndex=(slideIndex-1+slides.length)%slides.length;
+slides[slideIndex].classList.add("active");
+updateBlur();
+}
+
+function updateBlur(){
+const blur=document.getElementById("blurBg");
+blur.style.backgroundImage="url('"+slides[slideIndex].src+"')";
+blur.style.backgroundSize="cover";
+blur.style.backgroundPosition="center";
+}
+
+/* Floating hearts */
+function createHearts(){
+setInterval(()=>{
+const heart=document.createElement("div");
+heart.classList.add("heart");
+heart.innerHTML="❤️";
+heart.style.left=Math.random()*100+"vw";
+heart.style.animationDuration=(Math.random()*5+5)+"s";
+heart.style.fontSize=(Math.random()*20+15)+"px";
+document.body.appendChild(heart);
+setTimeout(()=>heart.remove(),10000);
+},500);
+}
+
+document.getElementById("shareBtn").addEventListener("click",function(){
+if(navigator.share){
+navigator.share({
+title:"Our Valentine ❤️",
+text:"Someone said YES 💍❤️",
+url:window.location.href
+});
+}else{
+alert("Copy this link:\n"+window.location.href);
+}
+});
+</script>
+
+</body>
+</html>
